@@ -1,0 +1,2 @@
+export const menuList=['ALL','NEW','TRENDY','VIBE','COOL','CRAZY','ALL','NEW','TRENDY','VIBE','COOL','CRAZY','ALL','NEW','TRENDY','VIBE','COOL','CRAZY','ALL','NEW','TRENDY','VIBE','COOL','CRAZY']
+ 

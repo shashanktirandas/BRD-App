@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Uploaded/generated application files
+server/uploads/
+
+# Production/build output
+dist/
+build/
+client/dist/
+server/dist/
+
+# Logs
+*.log
+logs/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local project inspection reports
+client_structure.txt
+server_structure.txt
+structure.txt
+server/backend-structure.txt
