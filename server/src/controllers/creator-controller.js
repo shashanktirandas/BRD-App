@@ -1,8 +1,9 @@
 
-const BirdPost = require("../model/BirdPost");
 const PhotographerProfile = require("../model/PhotographerProfile");
 const User = require("../model/User");
-const otpGenerator=require("otp-generator");
+const { uploadToCloudinary } =
+    require("../services/cloudinaryService");
+
 const { default: mongoose } = require("mongoose");
 const {
     creatorRegisterService,
@@ -105,7 +106,7 @@ const register_m=async(req,res)=>{
                     role: "creator"
                 },
                 {
-                    new: true,
+                    returnDocument: "after",
                     session
                 }
             
@@ -209,7 +210,7 @@ const register_u=async(req,res)=>{
                     role: "creator"
                 },
                 {
-                    new: true,
+                    returnDocument: "after",
                     session
                 }
             
@@ -253,45 +254,57 @@ const register_a=asyncHandler(
     })
 
 });
-// const register=async(req,res)=>{
-//         const creator=await creatorRegisterService(
-//         req.body,
-//         req.accessToken.userid
-//      )
-//     //  return res.status(201).json({
-//     //         success: true,
-//     //         message: "Successfully upgraded to creator.",
-//     //         data: creator
-//     //     });
-//     return successResponse(res,{
-//         statusCode:201,
-//         message:"Successfully upgraded to creator.",
-//         data:creator
-//     })
 
-// }
+//for deployment
 const register = async (req, res) => {
+
+    const profileImage =
+        req.files?.profileImage?.[0];
+
+    const coverImage =
+        req.files?.coverImage?.[0];
+
+    const cameraImage =
+        req.files?.cameraImage?.[0];
+
 
     const creatorData = {
         ...req.body,
 
-        profileImage: req.files?.profileImage?.[0]
-            ? `/uploads/${req.files.profileImage[0].filename}`
+        profileImage: profileImage
+            ? (
+                await uploadToCloudinary(
+                    profileImage.buffer,
+                    "brd/creators/profile"
+                )
+            ).secure_url
             : "",
 
-        coverImage: req.files?.coverImage?.[0]
-            ? `/uploads/${req.files.coverImage[0].filename}`
+        coverImage: coverImage
+            ? (
+                await uploadToCloudinary(
+                    coverImage.buffer,
+                    "brd/creators/cover"
+                )
+            ).secure_url
             : "",
 
-        cameraImage: req.files?.cameraImage?.[0]
-            ? `/uploads/${req.files.cameraImage[0].filename}`
+        cameraImage: cameraImage
+            ? (
+                await uploadToCloudinary(
+                    cameraImage.buffer,
+                    "brd/creators/camera"
+                )
+            ).secure_url
             : ""
     };
+
 
     const creator = await creatorRegisterService(
         creatorData,
         req.accessToken.userid
     );
+
 
     return successResponse(res, {
         statusCode: 201,
@@ -314,42 +327,74 @@ const updateCreator = async (req, res) => {
         ...req.body
     };
 
+
     // Profile image
     if (req.files?.profileImage?.[0]) {
+
+        const result =
+            await uploadToCloudinary(
+                req.files.profileImage[0].buffer,
+                "brd/creators/profile"
+            );
+
         updateData.profileImage =
-            `/uploads/${req.files.profileImage[0].filename}`;
+            result.secure_url;
     }
+
 
     // Cover image
     if (req.files?.coverImage?.[0]) {
+
+        const result =
+            await uploadToCloudinary(
+                req.files.coverImage[0].buffer,
+                "brd/creators/cover"
+            );
+
         updateData.coverImage =
-            `/uploads/${req.files.coverImage[0].filename}`;
+            result.secure_url;
     }
+
 
     // Camera image
     if (req.files?.cameraImage?.[0]) {
+
+        const result =
+            await uploadToCloudinary(
+                req.files.cameraImage[0].buffer,
+                "brd/creators/camera"
+            );
+
         updateData.cameraImage =
-            `/uploads/${req.files.cameraImage[0].filename}`;
+            result.secure_url;
     }
+
 
     // FormData sends this as a string
     if (typeof updateData.specialization === "string") {
+
         try {
+
             updateData.specialization =
                 JSON.parse(updateData.specialization);
+
         } catch (error) {
+
             return res.status(400).json({
                 success: false,
                 message: "Invalid specialization format."
             });
+
         }
     }
+
 
     const updatedCreator =
         await updateCreatorService(
             req.accessToken.userid,
             updateData
         );
+
 
     successResponse(res, {
         message: "Successfully updated creator.",
@@ -361,14 +406,25 @@ const updateCreator = async (req, res) => {
 
 const uploadPost = async (req, res) => {
 
+    let images = [];
+
+    if (req.file) {
+
+        const result =
+            await uploadToCloudinary(
+                req.file.buffer,
+                "brd/birds"
+            );
+
+        images = [
+            result.secure_url
+        ];
+    }
+
+
     const postData = {
         ...req.body,
- 
-        images: req.file
-            ? [
-                `/uploads/${req.file.filename}`
-            ]
-            : []
+        images
     };
 
 
@@ -382,7 +438,7 @@ const uploadPost = async (req, res) => {
     successResponse(res, {
 
         message:
-            `Bird post uploaded successfully.`,
+            "Bird post uploaded successfully.",
 
         data: {
 
@@ -391,7 +447,6 @@ const uploadPost = async (req, res) => {
         }
 
     });
-
 };
 
 const getPost= async(req,res)=>{

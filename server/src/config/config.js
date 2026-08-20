@@ -1,6 +1,14 @@
 require("dotenv").config();
 const validateEnvSchema=require("./config.schema")
-const {port,database,jwt,email}=validateEnvSchema(process.env);
+const {
+    port,
+    database,
+    jwt,
+    email,
+    cloudinaryCloudName,
+    cloudinaryApiKey,
+    cloudinaryApiSecret
+} = validateEnvSchema(process.env);
 const config={
     server:{
         port
@@ -13,6 +21,11 @@ const config={
     },
     email:{
         api:email
+    },
+    cloudinary: {
+        cloudName: cloudinaryCloudName,
+        apiKey: cloudinaryApiKey,
+        apiSecret: cloudinaryApiSecret
     }
 }
 

@@ -12,7 +12,6 @@ const errorHandler=require("./middleware/error_middleware")
 const cors =require("cors"); 
 const searchEngineTestRoute = require("./routes/search-engine-test-route");
 const auth_middleware = require("./middleware/auth_middleware");
-const path = require("path");
 const locationRoute = require("./routes/location_route");
 
 const app=express();
@@ -32,15 +31,7 @@ app.use("/search",search_route);
 app.use("/analytics",analytics_route);
 app.use("/user",user_route);
 app.use("/otp",otp_route);
-app.use(
-    "/uploads",
-    express.static(
-        path.join(
-            __dirname,
-            "../uploads"
-        )
-    )
-);
+
 app.use(
     "/location",
     locationRoute

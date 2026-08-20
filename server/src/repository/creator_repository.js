@@ -67,7 +67,7 @@ const  updateUserRoleWithSession=async(user,session)=>{
                     role: "creator"
                 },
                 {
-                    new: true,
+                    returnDocument: "after",
                     session
                 }
             
@@ -92,7 +92,7 @@ const updateCreatorById = async (creatorId, data) => {
             $set: data
         },
         {
-            new: true,
+            returnDocument: "after",
             runValidators: true
         }
     );

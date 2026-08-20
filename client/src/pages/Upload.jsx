@@ -15,7 +15,7 @@ import {
 } from "../services/locationService";
 
 const Upload = () => {
-  const {creator,token,setPosts,fetchPosts}=useContext(AppContext);
+  const {creator,token,setCreator,fetchPosts}=useContext(AppContext);
   const [img, setImg] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [birdName, setbirdName] = useState('');
@@ -259,18 +259,9 @@ const Upload = () => {
           // TAGS
           // ==========================================
 
-          const tagArray =tags.forEach((tag) => {
+          tags.forEach((tag) => {
                 formData.append("tags", tag);
             });
-
-          tagArray.forEach(tag => {
-
-              formData.append(
-                  "tags",
-                  tag
-              );
-
-          });
 
 
           // ==========================================

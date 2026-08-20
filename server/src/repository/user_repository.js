@@ -64,7 +64,7 @@ const removePartialUser=async(email,session)=>{
 }
 
 const updateById=async(userid,updatedData)=>{
-    return await User.findByIdAndUpdate(userid,updatedData,{ new: true });
+    return await User.findByIdAndUpdate(userid,updatedData,{ returnDocument: "after" });
 }
 
 const userById=async(userid)=>{

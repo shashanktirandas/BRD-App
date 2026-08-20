@@ -119,7 +119,7 @@ const Post = () => {
                                                                                         
                                                         </div>
                                                         <div className="lg:flex lg:gap-2">
-                                                        <img style={{backgroundColor:'#00000066'}} className='w-full   h-65 md:h-100 lg:h-90 rounded-lg' src={getImageUrl(post?.images?.[0])} alt="Post photo" />
+                                                        <img style={{backgroundColor:'#00000066'}} className='w-full   h-65 md:h-100 lg:h-90 max-w-180 rounded-lg' src={getImageUrl(post?.images?.[0])} alt="Post photo" />
                                                          <div className="w-full lg:w-[80%] lg:pt-5 flex flex-col lg:gap-2 gap-1">
                                                          <div className="pl-1 pt-1 w-full flex justify-between text-black">
                                                           <div className=" text-sm font-bold">{post.birdName}</div>
