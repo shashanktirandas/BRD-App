@@ -37,7 +37,7 @@ const Profile_transform = () => {
   const [city, setCity] = useState('');
   const navigate=useNavigate();
   const [open, setOpen] = useState(false);
-  const {fetchProfile}=useContext(AppContext);
+  const { fetchProfile, setToken } = useContext(AppContext);
   const [openOtp, setOpenOtp] = useState(false)
   const [profileImage, setProfileImage] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
@@ -286,11 +286,20 @@ const Profile_transform = () => {
 
             formData.append("isVerified", "false");
 
-            await profile_transform(formData);
+            const response = await profile_transform(formData);
+
+            const newToken = response.data?.data?.token;
+
+            if (!newToken) {
+                throw new Error("Creator registration succeeded but no new token was returned.");
+            }
+
+            localStorage.setItem("token", newToken);
+            setToken(newToken);
 
             setOpenOtp(false);
 
-            fetchProfile();
+            await fetchProfile();
 
             alert("Transformed to creator successfully");
 

@@ -18,243 +18,14 @@ const {
 const asyncHandler=require("./asyncHandler");
 const successResponse=require("./successResponse")
 
-const config=require("../config/config");
-const logger=require("../utils/logger");
+const config = require("../config/config");
+const jwt = require("jsonwebtoken");
+const logger = require("../utils/logger");
 const {
     BadRequestError,
     UnauthorizedError,
     NotFoundError
     }=require("../errors/AppError");
-const register_m=async(req,res)=>{
-     const session = await mongoose.startSession();
-    try{
-        const {
-                // user,
-                displayName,
-                
-                profileImage,
-                coverImage,
-                bio,
-                country,
-                state,
-                city,
-                experience,
-                cameraBrand,
-                cameraModel,
-                mainLens,
-                instagram,
-                website,
-                youtube,
-                specialization,
-                //isVerified
-            } = req.body;
-        
-        //check is userid exist
-        //console.log(req.accessToken);
-        const user=req.accessToken.userid;
-        const  existingUser=await User.findById(user);
-        if(!existingUser){
-            return res.status(401).json({
-                success:false,
-                message:"username didnt exist!, try with another userid.",
-                field:"user"
-            })
-        }
-        if(existingUser.role === "creator"){
-            return res.status(400).json({
-                success:false,
-                message:"User is already a creator."
-            });
-        }
-        const alreadyCreator = await PhotographerProfile.findOne({ user });
-        if (alreadyCreator) {
-            return res.status(400).json({
-                success: false,
-                message: "User is already a creator."
-            });
-        }
-
-       
-        const newPhotographer = await PhotographerProfile.create([{
-            user: user,
-            displayName: displayName,
-            profileImage: profileImage,
-            coverImage: coverImage,
-            bio: bio,
-            country: country,
-            state: state,
-            city: city,
-            experience: experience,
-            cameraBrand: cameraBrand,
-            cameraModel: cameraModel,
-            mainLens: mainLens,
-            instagram: instagram,
-            website: website,
-            youtube: youtube,
-            specialization: specialization
-        }],{
-            session
-        });
-        if(!newPhotographer){
-            return res.status(401).json({
-                success:false,
-                message:"something went wrong in mongooes at creator register."
-            })
-        }
-        const upgradedUser=await User.findByIdAndUpdate(user,
-                {
-                    role: "creator"
-                },
-                {
-                    returnDocument: "after",
-                    session
-                }
-            
-            );
-        await session.commitTransaction();
-        
-        return res.status(201).json({
-            success: true,
-            message: "Successfully upgraded to creator.",
-            data: newPhotographer[0]
-        });
-    }catch(err){
-        await session.abortTransaction();
-        console.log(err)
-        res.status(501).json({
-            success:false,
-            message:"error occur in signup logic"
-        })
-        
-        
-    } finally{
-        await session.endSession();
-    }
-}
-const register_u=async(req,res)=>{
-     const session = await mongoose.startSession();
-    try{
-        const {
-                // user,
-                displayName,
-                
-                profileImage,
-                coverImage,
-                bio,
-                country,
-                state,
-                city,
-                experience,
-                cameraBrand,
-                cameraModel,
-                mainLens,
-                instagram,
-                website,
-                youtube,
-                specialization,
-                //isVerified
-            } = req.body;
-        
-        //check is userid exist
-        //console.log(req.accessToken);
-        const user=req.accessToken.userid;
-        const  existingUser=await User.findById(user);
-        if(!existingUser){
-            return res.status(401).json({
-                success:false,
-                message:"username didnt exist!, try with another userid.",
-                field:"user"
-            })
-        }
-        if(existingUser.role === "creator"){
-            return res.status(400).json({
-                success:false,
-                message:"User is already a creator."
-            });
-        }
-        const alreadyCreator = await PhotographerProfile.findOne({ user });
-        if (alreadyCreator) {
-            return res.status(400).json({
-                success: false,
-                message: "User is already a creator."
-            });
-        }
-
-        let newPhotographer;
-        await session.withTransaction(async()=>{
-
-        
-         newPhotographer = await PhotographerProfile.create([{
-            user,
-            displayName,
-            profileImage,
-            coverImage,
-            bio,
-            country,
-            state,
-            city,
-            experience,
-            cameraBrand,
-            cameraModel,
-            mainLens,
-            instagram,
-            website,
-            youtube,
-            specialization
-        }],{
-            session
-        });
-        
-        const upgradedUser=await User.findByIdAndUpdate(user,
-                {
-                    role: "creator"
-                },
-                {
-                    returnDocument: "after",
-                    session
-                }
-            
-            );
-        
-        })
-        return res.status(201).json({
-            success: true,
-            message: "Successfully upgraded to creator.",
-            data: newPhotographer[0]
-        });
-        
-    }catch(err){
-        
-        console.log(err)
-        res.status(501).json({
-            success:false,
-            message:"error occur in signup logic"
-        })
-        
-        
-    } finally{
-        await session.endSession();
-    }
-}
-const register_a=asyncHandler(
-    async(req,res)=>{
-        const creator=await creatorRegisterService(
-        req.body,
-        req.accessToken.userid
-     )
-    //  return res.status(201).json({
-    //         success: true,
-    //         message: "Successfully upgraded to creator.",
-    //         data: creator
-    //     });
-    return successResponse(res,{
-        statusCode:201,
-        message:"Successfully upgraded to creator.",
-        data:creator
-    })
-
-});
-
 //for deployment
 const register = async (req, res) => {
 
@@ -305,12 +76,30 @@ const register = async (req, res) => {
         req.accessToken.userid
     );
 
+    const updatedUser = await User.findById(
+        req.accessToken.userid
+    );
+
+    const accessToken = jwt.sign(
+        {
+            userid: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            role: updatedUser.role
+        },
+        config.jwt.secret
+    );
+
 
     return successResponse(res, {
         statusCode: 201,
         message: "Successfully upgraded to creator.",
-        data: creator
+        data: {
+            creator,
+            token: accessToken
+        }
     });
+
 };
 const getCreator= async(req,res)=>{
         const creatorDetails =  await getCreatorService(req.accessToken.userid);
