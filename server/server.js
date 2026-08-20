@@ -8,11 +8,11 @@ const app=require("./src/app")
 
 ConnectDB();
 
-const PORT=config.server.port;
+const PORT = config.server.port;
 
-app.listen(PORT,()=>{
+app.listen(PORT, "0.0.0.0", () => {
     logger.info({
-            event:LOG_EVENTS.SERVER_STARTED,
-            port:PORT
-    })
-})
+        event: LOG_EVENTS.SERVER_STARTED,
+        port: PORT
+    });
+});
