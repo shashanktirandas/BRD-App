@@ -122,7 +122,17 @@ export default function EditCard(props) {
                      
           }
   return (
-    <div  className="gap-1 w-78 lg:w-90 min-h-80 p-2 shadow-xl rounded-lg pb-4  ">
+    <div
+          className="
+              w-full
+              min-w-0
+              p-2
+              pb-4
+              bg-white
+              shadow-xl
+              rounded-2xl
+          "
+      >
                             <div 
                                   className="w-full flex justify-end text-lg text-black relative"
                                   ref={menuRef} >
@@ -146,7 +156,18 @@ export default function EditCard(props) {
                                 
                             </div>
                                <button className='w-full gap-1 text-start' onClick={()=>navigate(`/post-view/${props.ele._id}`)} >
-                            <img style={{backgroundColor:'#00000066'}} className='w-full h-55 lg:h-60      rounded-lg' src={getImageUrl(props.ele.images?.[0])} alt="Post photo" />
+                            <img
+                                  style={{ backgroundColor: "#00000066" }}
+                                  className="
+                                      w-full
+                                      h-auto
+                                      min-h-56
+                                      rounded-lg
+                                      block
+                                  "
+                                  src={getImageUrl(props.ele.images?.[0])}
+                                  alt="Post photo"
+                              />
                              </button>
                              <div className="pl-1 pt-1 w-full flex justify-between text-black">
                               <div className=" text-sm font-bold">{props.ele.birdName}</div>

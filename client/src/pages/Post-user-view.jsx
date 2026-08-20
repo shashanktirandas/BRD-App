@@ -9,6 +9,9 @@ import { CiBookmark, CiHeart } from 'react-icons/ci';
 import AppContext from '../context/AppContext';
 import { creator_getsinglepost } from '../services/creatorService';
 import { getImageUrl } from '../utils/imageUrl';
+
+import MasonrySkeleton from "../components/loading/MasonrySkeleton";
+
 import {
     bookmark_post,
     check_post_bookmark,
@@ -374,11 +377,9 @@ const Post_user_view = () => {
                       selectedMenu={selectedSimilarMenu}
                   />
                   {loadingSimilar ? (
-                      <div className="w-full text-center py-6 text-gray-500">
-                          Loading similar posts...
-                      </div>
+                      <MasonrySkeleton count={6} />
                   ) : (
-                      <PostCard list={similarPosts}/>
+                      <PostCard list={similarPosts} />
                   )}
                   </div>
 

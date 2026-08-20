@@ -111,6 +111,8 @@ import {
     useParams
 } from "react-router-dom";
 
+import MasonrySkeleton from "../components/loading/MasonrySkeleton";
+
 import SearchNavbar from "../components/SearchNavbar";
 import Card from "../components/Card";
 import AppContext from "../context/AppContext";
@@ -233,21 +235,33 @@ const Search_result = () => {
         return (
             <div className="w-full min-h-screen bg-white">
 
-                <SearchNavbar  />
+                <SearchNavbar />
 
-                <div className="w-full flex justify-center items-center py-20">
+                <div className="w-full px-3 sm:px-5 pt-4">
 
-                    <div className="flex flex-col items-center gap-3">
+                    <p className="
+                        text-sm
+                        text-gray-400
+                        px-1
+                        mb-2
+                    ">
+                        Searching
+                    </p>
 
-                        <div className="w-8 h-8 border-4 border-gray-200 border-t-black rounded-full animate-spin" />
-
-                        <p className="text-sm text-gray-500">
-                            Searching for "{urlQuery}"...
-                        </p>
-
-                    </div>
+                    <h1 className="
+                        text-xl
+                        sm:text-2xl
+                        font-bold
+                        text-gray-900
+                        px-1
+                        mb-2
+                    ">
+                        "{urlQuery}"
+                    </h1>
 
                 </div>
+
+                <MasonrySkeleton count={8} />
 
             </div>
         );
@@ -391,13 +405,13 @@ const Search_result = () => {
                     <div className="w-full mx-auto">
 
                         <div className="
-                                grid
-                                grid-cols-1
-                                sm:grid-cols-2
-                                lg:grid-cols-3
-                                xl:grid-cols-4
+                                columns-1
+                                sm:columns-2
+                                lg:columns-3
+                                xl:columns-4
                                 gap-4
                             ">
+   
 
                             {feed.map((item, index) => {
 
@@ -414,14 +428,11 @@ const Search_result = () => {
                                             className="
                                                 w-full
                                                 min-w-0
+                                                mb-4
+                                                break-inside-avoid
                                             "
                                         >
-
-                                            {/* <Card
-                                                ele={item.data}
-                                            /> */}
                                             <Card ele={item.data} variant="search" />
-
                                         </div>
 
                                     );
@@ -459,41 +470,23 @@ const Search_result = () => {
                                         <button
                                             key={`creator-${creatorId || index}`}
                                             type="button"
-
-                                            onClick={() =>
-                                                navigate(
-                                                    `/creator/${creatorId}`
-                                                )
-                                            }
-
+                                            onClick={() => navigate(`/creator/${creatorId}`)}
                                             className="
-                                                col-span-1
-                                                sm:col-span-2
-                                                lg:col-span-3
-                                                xl:col-span-4
-
                                                 w-full
-                                                max-w-2xl
-                                                mx-auto
-
+                                                mb-4
+                                                break-inside-avoid
                                                 bg-white
                                                 border
                                                 border-gray-100
-
                                                 shadow-sm
                                                 hover:shadow-lg
-
                                                 rounded-2xl
-
                                                 flex
                                                 items-center
                                                 gap-4
-
                                                 px-4
                                                 py-4
-
                                                 text-left
-
                                                 transition
                                                 duration-200
                                             "
@@ -602,30 +595,18 @@ const Search_result = () => {
                                         <button
                                             key={`bird-${bird?.scientificName || bird?.birdName || index}`}
                                             type="button"
-
                                             className="
-                                                col-span-1
-                                                sm:col-span-2
-                                                lg:col-span-3
-                                                xl:col-span-4
-
                                                 w-full
-                                                max-w-2xl
-                                                mx-auto
-
+                                                mb-4
+                                                break-inside-avoid
                                                 bg-white
                                                 border
                                                 border-gray-100
-
                                                 shadow-sm
                                                 hover:shadow-lg
-
                                                 rounded-2xl
-
                                                 p-5
-
                                                 text-left
-
                                                 transition
                                                 duration-200
                                             "
@@ -711,37 +692,29 @@ const Search_result = () => {
 
                 <div
                     ref={loadMoreRef}
-                    className="
-                        w-full
-                        flex
-                        justify-center
-                        py-8
-                    "
+                    className="w-full"
                 >
 
                     {searchLoading && (
-
-                        <div className="
-                            w-7
-                            h-7
-                            border-4
-                            border-gray-200
-                            border-t-black
-                            rounded-full
-                            animate-spin
-                        " />
-
+                        <MasonrySkeleton count={4} />
                     )}
 
                     {!searchLoading &&
                         searchPagination?.hasMore && (
 
-                        <p className="
-                            text-xs
-                            text-gray-400
+                        <div className="
+                            w-full
+                            flex
+                            justify-center
+                            py-8
                         ">
-                            Loading more...
-                        </p>
+                            <p className="
+                                text-xs
+                                text-gray-400
+                            ">
+                                Scroll for more
+                            </p>
+                        </div>
 
                     )}
 

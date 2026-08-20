@@ -16,93 +16,125 @@ const Signup = () => {
   const navigate=useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [openOtp, setOpenOtp] = useState(false)
-  const handleSignup = async (e) => {
+  const [signupState, setSignupState] = useState(null);
+    const handleSignup = async (e) => {
 
-      e.preventDefault();
+        e.preventDefault();
 
-      // Basic required-field checks
-      if (!username.trim()) {
-          alert("Please enter username.");
-          return;
-      }
+        if (!username.trim()) {
+            alert("Please enter username.");
+            return;
+        }
 
-      if (!email.trim()) {
-          alert("Please enter email.");
-          return;
-      }
+        if (!email.trim()) {
+            alert("Please enter email.");
+            return;
+        }
 
-      if (!password) {
-          alert("Please enter password.");
-          return;
-      }
+        if (!password) {
+            alert("Please enter password.");
+            return;
+        }
 
-      try {
+        try {
 
-          const response = await partialSignupV2({
-              username: username.trim(),
-              email: email.trim(),
-              password
-          });
+            // STEP 1
+            setSignupState({
+                step: "checking",
+                message: "Checking your details..."
+            });
 
-          console.log(
-              "Signup response:",
-              response.data
-          );
+            await new Promise(resolve =>
+                setTimeout(resolve, 350)
+            );
 
-          localStorage.setItem(
-              "userid",
-              response.data.data.userid
-          );
+            // STEP 2
+            setSignupState({
+                step: "creating",
+                message: "Creating your account..."
+            });
 
-          setOpenOtp(true);
+            const response = await partialSignupV2({
+                username: username.trim(),
+                email: email.trim(),
+                password
+            });
 
-      } catch (err) {
+            console.log(
+                "Signup response:",
+                response.data
+            );
 
-          console.error(
-              "Signup error:",
-              err.response?.data || err
-          );
+            localStorage.setItem(
+                "userid",
+                response.data.data.userid
+            );
 
-          const backendMessage =
-              err.response?.data?.message;
+            // STEP 3
+            setSignupState({
+                step: "otp",
+                message: "Sending your verification code..."
+            });
 
-          if (backendMessage) {
+            await new Promise(resolve =>
+                setTimeout(resolve, 500)
+            );
 
-              try {
+            // Stop loading before opening OTP modal
+            setSignupState(null);
+            setOpenOtp(true);
 
-                  // Zod validation errors may arrive
-                  // as a JSON string
-                  const parsed =
-                      JSON.parse(backendMessage);
+        } catch (err) {
 
-                  if (
-                      Array.isArray(parsed) &&
-                      parsed.length > 0
-                  ) {
+            console.error(
+                "Signup error:",
+                err.response?.data || err
+            );
 
-                      const firstMessage = parsed
-                          .map(item => item.message)
-                          .find(Boolean);
+            setSignupState(null);
 
-                      alert(firstMessage || "Invalid input.");
+            const backendMessage =
+                err.response?.data?.message;
 
-                      return;
-                  }
+            if (backendMessage) {
 
-              } catch {
-                  // Normal string message
-              }
+                try {
 
-              alert(backendMessage);
+                    const parsed =
+                        JSON.parse(backendMessage);
 
-              return;
-          }
+                    if (
+                        Array.isArray(parsed) &&
+                        parsed.length > 0
+                    ) {
 
-          alert(
-              "Something went wrong. Please try again."
-          );
-      }
-  };
+                        const firstMessage =
+                            parsed
+                                .map(item => item.message)
+                                .find(Boolean);
+
+                        alert(
+                            firstMessage ||
+                            "Invalid input."
+                        );
+
+                        return;
+                    }
+
+                } catch {
+                    // Normal backend message
+                }
+
+                alert(backendMessage);
+
+                return;
+            }
+
+            alert(
+                "Something went wrong. Please try again."
+            );
+        }
+    };
   const signup=async()=>{
     const userid = localStorage.getItem("userid");
       try {
@@ -124,7 +156,174 @@ const Signup = () => {
     <div>
       <div className="w-full min-h-screen bg-white relative  ">
             <div className="w-full  flex flex-col gap-3 items-center bg-white  absolute top-0 z-10">
-                   <div className="w-full md:w-100 lg:w-100 flex flex-col gap-3">
+                   <div className="
+                        relative
+                        w-full
+                        md:w-100
+                        lg:w-100
+                        flex
+                        flex-col
+                        gap-3
+                    ">
+                {signupState && (
+                    <div className="
+                        absolute
+                        inset-0
+                        z-50
+                        rounded-3xl
+                        bg-white/90
+                        backdrop-blur-sm
+                        flex
+                        items-center
+                        justify-center
+                        p-6
+                        animate-[fadeIn_.2s_ease-out]
+                    ">
+
+                        <div className="
+                            w-full
+                            max-w-xs
+                            bg-white
+                            rounded-3xl
+                            border
+                            border-gray-200
+                            shadow-xl
+                            px-5
+                            py-6
+                        ">
+
+                            {/* ICON */}
+
+                            <div className="
+                                w-12
+                                h-12
+                                mx-auto
+                                rounded-2xl
+                                bg-gray-50
+                                border
+                                border-gray-100
+                                flex
+                                items-center
+                                justify-center
+                            ">
+
+                                <span className="
+                                    w-6
+                                    h-6
+                                    border-[3px]
+                                    border-gray-200
+                                    border-t-black
+                                    rounded-full
+                                    animate-spin
+                                " />
+
+                            </div>
+
+
+                            {/* MESSAGE */}
+
+                            <div className="text-center mt-4">
+
+                                <h3 className="
+                                    text-base
+                                    font-bold
+                                    text-gray-900
+                                ">
+                                    {signupState.message}
+                                </h3>
+
+                                <p className="
+                                    text-[11px]
+                                    text-gray-400
+                                    mt-1
+                                ">
+                                    We're getting your BRD account ready.
+                                </p>
+
+                            </div>
+
+
+                            {/* PROGRESS */}
+
+                            <div className="
+                                mt-6
+                                flex
+                                items-center
+                                gap-2
+                            ">
+
+                                {/* STEP 1 */}
+
+                                <div className={`
+                                    h-1.5
+                                    flex-1
+                                    rounded-full
+                                    transition-all
+                                    duration-500
+                                    ${
+                                        ["checking", "creating", "otp"]
+                                            .includes(signupState.step)
+                                            ? "bg-black"
+                                            : "bg-gray-100"
+                                    }
+                                `} />
+
+
+                                {/* STEP 2 */}
+
+                                <div className={`
+                                    h-1.5
+                                    flex-1
+                                    rounded-full
+                                    transition-all
+                                    duration-500
+                                    ${
+                                        ["creating", "otp"]
+                                            .includes(signupState.step)
+                                            ? "bg-black"
+                                            : "bg-gray-100"
+                                    }
+                                `} />
+
+
+                                {/* STEP 3 */}
+
+                                <div className={`
+                                    h-1.5
+                                    flex-1
+                                    rounded-full
+                                    transition-all
+                                    duration-500
+                                    ${
+                                        signupState.step === "otp"
+                                            ? "bg-green-500"
+                                            : "bg-gray-100"
+                                    }
+                                `} />
+
+                            </div>
+
+
+                            {/* LABELS */}
+
+                            <div className="
+                                mt-2
+                                flex
+                                justify-between
+                                text-[9px]
+                                text-gray-400
+                            ">
+
+                                <span>Check</span>
+                                <span>Create</span>
+                                <span>Verify</span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                )}
                 <div className="w-full flex flex-col items-center">
                   <img className='w-35 h-35 object-cover ' src={brd_logo} alt="" />
                   <h1 className='text-2xl font-bold text-black'>BRD</h1>
@@ -184,7 +383,64 @@ const Signup = () => {
                                                 
                                                                                                   </div>
                                               </div>
-                                              <button onClick={(e)=>handleSignup(e)} style={{backgroundColor:'#99d66f'}} className='mt-3 w-full text-sm text-black px-4 py-3 rounded-sm'>signup</button>
+                                                <button
+                                                    onClick={(e) => handleSignup(e)}
+                                                    disabled={!!signupState}
+                                                    style={{ backgroundColor: '#99d66f' }}
+                                                    className="
+                                                        relative
+                                                        mt-3
+                                                        w-full
+                                                        h-12
+                                                        text-sm
+                                                        text-black
+                                                        px-4
+                                                        rounded-xl
+                                                        font-semibold
+                                                        overflow-hidden
+                                                        transition-all
+                                                        duration-200
+                                                        disabled:opacity-70
+                                                        disabled:cursor-not-allowed
+                                                    "
+                                                >
+                                                    {signupState ? (
+                                                        <>
+                                                            <span className="
+                                                                absolute
+                                                                inset-0
+                                                                bg-black/5
+                                                                animate-pulse
+                                                            " />
+
+                                                            <span className="
+                                                                relative
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                gap-3
+                                                            ">
+
+                                                                <span className="
+                                                                    w-5
+                                                                    h-5
+                                                                    border-[2.5px]
+                                                                    border-black/20
+                                                                    border-t-black
+                                                                    rounded-full
+                                                                    animate-spin
+                                                                " />
+
+                                                                <span>
+                                                                    {signupState.message}
+                                                                </span>
+
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        "Sign up"
+                                                    )}
+                                                </button>
                       </div>
                       <AuthOtpModal
                         isOpen={openOtp}

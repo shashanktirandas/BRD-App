@@ -35,6 +35,8 @@ const Card = (props) => {
     const isSearchCard =
         props.variant === "search";
     const [showMore, setShowMore] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageError, setImageError] = useState(false);
     const navigate=useNavigate();
     const sharePost = async () => {
 
@@ -215,22 +217,125 @@ const Card = (props) => {
     
   return (
     <div
-        className={`
-            gap-1
-            ${isSearchCard ? "w-full" : "w-78 lg:w-90"}
-            min-h-85
-            p-2
-            shadow-xl
-            rounded-lg
-            pb-4
-        `}
+        className="
+        w-full
+        min-w-0
+        bg-white
+        border
+        border-gray-100
+        shadow-sm
+        hover:shadow-lg
+        rounded-2xl
+        p-2
+        pb-4
+        transition-all
+        duration-200
+    "
     >
                                <button
                                     ref={cardRef}
                                     className='gap-1 w-full text-start'
                                     onClick={() => navigate(`/post/${props.ele._id}`)}
                                 >
-                            <img style={{backgroundColor:'#00000066'}} className='w-full h-55 lg:h-60      rounded-lg' src={getImageUrl(props.ele.images?.[0])} alt="Post photo" />
+                            <div className="
+                                relative
+                                w-full
+                                min-h-56
+                                rounded-lg
+                                overflow-hidden
+                                bg-gray-100
+                            ">
+
+                                {/* IMAGE LOADING STATE */}
+
+                                {!imageLoaded && !imageError && (
+                                    <div className="
+                                        absolute
+                                        inset-0
+                                        bg-gray-100
+                                        overflow-hidden
+                                    ">
+
+                                        {/* Shimmer */}
+
+                                        <div className="
+                                            absolute
+                                            inset-y-0
+                                            -left-1/2
+                                            w-1/2
+                                            bg-gradient-to-r
+                                            from-transparent
+                                            via-white/60
+                                            to-transparent
+                                            animate-[imageShimmer_1.4s_infinite]
+                                        " />
+
+                                        {/* Center indicator */}
+
+                                        <div className="
+                                            absolute
+                                            inset-0
+                                            flex
+                                            items-center
+                                            justify-center
+                                        ">
+
+                                            <div className="
+                                                w-8
+                                                h-8
+                                                rounded-full
+                                                border-[2px]
+                                                border-gray-300
+                                                border-t-gray-500
+                                                animate-spin
+                                            " />
+
+                                        </div>
+
+                                    </div>
+                                )}
+
+                                {/* ACTUAL IMAGE */}
+
+                                <img
+                                    src={getImageUrl(props.ele.images?.[0])}
+                                    alt="Post photo"
+                                    onLoad={() => setImageLoaded(true)}
+                                    onError={() => setImageError(true)}
+                                    className={`
+                                        w-full
+                                        h-auto
+                                        min-h-56
+                                        rounded-lg
+                                        block
+                                        transition-opacity
+                                        duration-500
+                                        ${
+                                            imageLoaded
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        }
+                                    `}
+                                />
+
+                                {/* IMAGE ERROR */}
+
+                                {imageError && (
+                                    <div className="
+                                        absolute
+                                        inset-0
+                                        flex
+                                        items-center
+                                        justify-center
+                                        bg-gray-100
+                                        text-xs
+                                        text-gray-400
+                                    ">
+                                        Unable to load image
+                                    </div>
+                                )}
+
+                            </div>
                              </button>
                              <div className="pl-1 pt-1 w-full flex justify-between text-black">
                               <div className=" text-sm font-bold">{props.ele.birdName}</div>
@@ -287,13 +392,28 @@ const Card = (props) => {
                               {
                                 showMore && (
                                   <>
-                                  <div className={'pl-1 text-[12px] font-semibold text-blue-400 '}>
-                                          {props.ele.tags?.map((tag, index) => (
-                                              <span key={`${tag}-${index}`} className="mr-1">
-                                                  #{tag}
-                                              </span>
-                                          ))}
-                                      </div>
+                                  <div className="
+                                        pl-1
+                                        pr-1
+                                        pt-1
+                                        flex
+                                        flex-wrap
+                                        gap-x-2
+                                        text-[12px]
+                                        font-semibold
+                                        text-blue-400
+                                        break-words
+                                    
+                                    ">
+                                        {props.ele.tags?.map((tag, index) => (
+                                            <span
+                                                key={`${tag}-${index}`}
+                                                className="break-words"
+                                            >
+                                                #{tag}
+                                            </span>
+                                        ))}
+                                    </div>
                                     <button
                                           onClick={() => setShowMore(false)}
                                           className="pl-1 text-xs text-gray-500"

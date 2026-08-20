@@ -13,6 +13,7 @@ const Login = () => {
     const navigate=useNavigate();
     const { setToken } = useContext(AppContext);
     const [showPassword, setShowPassword] = useState(false);
+    const [loginState, setLoginState] = useState(null);
     const handleLogin = async (e) => {
 
         e.preventDefault();
@@ -30,6 +31,22 @@ const Login = () => {
 
         try {
 
+            // STEP 1
+            setLoginState({
+                step: "checking",
+                message: "Checking your details..."
+            });
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 350)
+            );
+
+            // STEP 2
+            setLoginState({
+                step: "verifying",
+                message: "Verifying your account..."
+            });
+
             const response = await login({
                 username: username.trim(),
                 password
@@ -40,6 +57,12 @@ const Login = () => {
                 response.data
             );
 
+            // STEP 3
+            setLoginState({
+                step: "session",
+                message: "Preparing your session..."
+            });
+
             localStorage.setItem(
                 "token",
                 response.data.data.token
@@ -47,6 +70,16 @@ const Login = () => {
 
             setToken(
                 response.data.data.token
+            );
+
+            // STEP 4
+            setLoginState({
+                step: "success",
+                message: "Welcome back!"
+            });
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 700)
             );
 
             navigate("/");
@@ -57,6 +90,8 @@ const Login = () => {
                 "Login error:",
                 err.response?.data || err
             );
+
+            setLoginState(null);
 
             const backendMessage =
                 err.response?.data?.message;
@@ -116,7 +151,7 @@ const Login = () => {
                     </div>
                   </div>
   
-                  <div className="text-start w-full rounded-xl  min-h-10 px-4 py-3 text-black flex flex-col gap-2 items-center ">
+                  <div className=" relative text-start w-full rounded-xl  min-h-10 px-4 py-3 text-black flex flex-col gap-2 items-center ">
                                                 <div className="w-full h-full flex flex-col justify-between  gap-2">
                                                   <h2 className='text-[12px]  font-semibold text-gray-400'>Username</h2>
                                                   <input className="w-full bg-gray-100 rounded-2xl text-md px-5 py-3"
@@ -156,17 +191,282 @@ const Login = () => {
 
                                                   </div>
                                                 </div>
-                                                <button onClick={(e)=>handleLogin(e)} style={{backgroundColor:'#99d66f'}} className='mt-3 w-full text-sm text-black px-4 py-3 rounded-sm'>Login</button>
-                        </div>
+                                                <button
+                                                    onClick={(e) => handleLogin(e)}
+                                                    disabled={!!loginState}
+                                                    style={{ backgroundColor: '#99d66f' }}
+                                                    className="
+                                                        relative
+                                                        mt-3
+                                                        w-full
+                                                        h-12
+                                                        text-sm
+                                                        text-black
+                                                        px-4
+                                                        rounded-xl
+                                                        font-semibold
+                                                        overflow-hidden
+                                                        transition-all
+                                                        duration-200
+                                                        disabled:cursor-not-allowed
+                                                    "
+                                                >
+                                                    {loginState ? (
+                                                        <>
+                                                            {/* animated background */}
+                                                            <span
+                                                                className="
+                                                                    absolute
+                                                                    inset-0
+                                                                    bg-black/5
+                                                                    animate-pulse
+                                                                "
+                                                            />
+
+                                                            <span className="
+                                                                relative
+                                                                flex
+                                                                items-center
+                                                                justify-center
+                                                                gap-3
+                                                            ">
+                                                                {loginState.step === "success" ? (
+                                                                    <span className="
+                                                                        w-5
+                                                                        h-5
+                                                                        rounded-full
+                                                                        bg-green-600
+                                                                        text-white
+                                                                        flex
+                                                                        items-center
+                                                                        justify-center
+                                                                        text-xs
+                                                                        font-bold
+                                                                    ">
+                                                                        ✓
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="
+                                                                        w-5
+                                                                        h-5
+                                                                        border-[2.5px]
+                                                                        border-black/20
+                                                                        border-t-black
+                                                                        rounded-full
+                                                                        animate-spin
+                                                                    " />
+                                                                )}
+
+                                                                <span>
+                                                                    {loginState.message}
+                                                                </span>
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        "Login"
+                                                    )}
+                                                </button>
+                                {loginState && (
+                                    <div className="
+                                        absolute
+                                        inset-0
+                                        z-20
+                                        rounded-2xl
+                                        bg-white/90
+                                        backdrop-blur-sm
+                                        flex
+                                        items-center
+                                        justify-center
+                                        p-6
+                                    ">
+
+                                    {/* TOP STATUS */}
+                                    <div className="
+                                        flex
+                                        items-center
+                                        gap-3
+                                    ">
+
+                                        <div className="
+                                            w-9
+                                            h-9
+                                            rounded-full
+                                            bg-gray-50
+                                            border
+                                            border-gray-100
+                                            flex
+                                            items-center
+                                            justify-center
+                                            shrink-0
+                                        ">
+
+                                            {loginState.step === "success" ? (
+                                                <span className="
+                                                    w-6
+                                                    h-6
+                                                    rounded-full
+                                                    bg-green-500
+                                                    text-white
+                                                    flex
+                                                    items-center
+                                                    justify-center
+                                                    font-bold
+                                                    text-sm
+                                                ">
+                                                    ✓
+                                                </span>
+                                            ) : (
+                                                <span className="
+                                                    w-5
+                                                    h-5
+                                                    border-[2.5px]
+                                                    border-gray-200
+                                                    border-t-black
+                                                    rounded-full
+                                                    animate-spin
+                                                " />
+                                            )}
+
+                                        </div>
+
+                                        <div>
+
+                                            <p className="
+                                                text-sm
+                                                font-bold
+                                                text-gray-900
+                                            ">
+                                                {loginState.message}
+                                            </p>
+
+                                            <p className="
+                                                text-[11px]
+                                                text-gray-400
+                                                mt-0.5
+                                            ">
+                                                {loginState.step === "success"
+                                                    ? "Opening your BRD feed..."
+                                                    : "Please wait while we sign you in."
+                                                }
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    {/* PROGRESS STEPS */}
+
+                                    <div className="
+                                        mt-4
+                                        flex
+                                        items-center
+                                        gap-2
+                                    ">
+
+                                        {/* STEP 1 */}
+
+                                        <div className={`
+                                            h-1.5
+                                            flex-1
+                                            rounded-full
+                                            transition-all
+                                            duration-500
+                                            ${
+                                                ["checking", "verifying", "session", "success"]
+                                                    .includes(loginState.step)
+                                                    ? "bg-black"
+                                                    : "bg-gray-100"
+                                            }
+                                        `} />
+
+
+                                        {/* STEP 2 */}
+
+                                        <div className={`
+                                            h-1.5
+                                            flex-1
+                                            rounded-full
+                                            transition-all
+                                            duration-500
+                                            ${
+                                                ["verifying", "session", "success"]
+                                                    .includes(loginState.step)
+                                                    ? "bg-black"
+                                                    : "bg-gray-100"
+                                            }
+                                        `} />
+
+
+                                        {/* STEP 3 */}
+
+                                        <div className={`
+                                            h-1.5
+                                            flex-1
+                                            rounded-full
+                                            transition-all
+                                            duration-500
+                                            ${
+                                                ["session", "success"]
+                                                    .includes(loginState.step)
+                                                    ? "bg-black"
+                                                    : "bg-gray-100"
+                                            }
+                                        `} />
+
+
+                                        {/* STEP 4 */}
+
+                                        <div className={`
+                                            h-1.5
+                                            flex-1
+                                            rounded-full
+                                            transition-all
+                                            duration-500
+                                            ${
+                                                loginState.step === "success"
+                                                    ? "bg-green-500"
+                                                    : "bg-gray-100"
+                                            }
+                                        `} />
+
+                                    </div>
+
+
+                                    {/* STEP LABELS */}
+
+                                    <div className="
+                                        mt-2
+                                        flex
+                                        justify-between
+                                        text-[9px]
+                                        text-gray-400
+                                    ">
+
+                                        <span>Check</span>
+                                        <span>Verify</span>
+                                        <span>Session</span>
+                                        <span>Ready</span>
+
+                                    </div>
+
+                                </div>
+                            )}
+                                                </div>
                         
                           
                 </div>
+                
               </div>
+               
               <div className="absolute bottom-0 left-0 w-full h-10 md:h-20 lg:h-20 bg-[#3d84cd]"
                             style={{
                               clipPath: "polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)",
                             }}
-                          ></div>
+                          >
+                           
+                          </div>
+                
         </div>
         
       </div>

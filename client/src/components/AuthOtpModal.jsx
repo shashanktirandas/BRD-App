@@ -158,9 +158,154 @@ const AuthOtpModal = ({
       <div className="w-full flex flex-col gap-3 items-center bg-white ">
 
         <div
-          className="w-full md:w-100 lg:w-100 flex flex-col gap-3"
+            className="
+                relative
+                w-full
+                md:w-100
+                lg:w-100
+                flex
+                flex-col
+                gap-3
+            "
         >
+            {loading && (
+                <div className="
+                    absolute
+                    inset-0
+                    z-[999]
+                    flex
+                    items-center
+                    justify-center
+                    rounded-3xl
+                    bg-black/20
+                    backdrop-blur-[3px]
+                    p-5
+                ">
 
+                    <div className="
+                        w-full
+                        max-w-[280px]
+                        rounded-3xl
+                        bg-white
+                        border
+                        border-gray-100
+                        shadow-[0_20px_60px_rgba(0,0,0,0.18)]
+                        px-6
+                        py-7
+                        text-center
+                    ">
+
+                        {/* Animated icon */}
+
+                        <div className="
+                            relative
+                            w-16
+                            h-16
+                            mx-auto
+                            flex
+                            items-center
+                            justify-center
+                        ">
+
+                            {/* outer pulse */}
+                            <div className="
+                                absolute
+                                inset-0
+                                rounded-full
+                                bg-[#3d84cd]/10
+                                animate-ping
+                            " />
+
+                            {/* spinner */}
+
+                            <div className="
+                                relative
+                                w-11
+                                h-11
+                                rounded-full
+                                border-[3px]
+                                border-gray-200
+                                border-t-[#3d84cd]
+                                animate-spin
+                            " />
+
+                        </div>
+
+
+                        {/* Title */}
+
+                        <h3 className="
+                            mt-5
+                            text-base
+                            font-bold
+                            text-gray-900
+                        ">
+                            Verifying your code
+                        </h3>
+
+
+                        {/* Description */}
+
+                        <p className="
+                            mt-1.5
+                            text-xs
+                            leading-5
+                            text-gray-400
+                        ">
+                            Please wait while we confirm your account.
+                        </p>
+
+
+                        {/* Animated progress */}
+
+                        <div className="
+                            mt-6
+                            h-1.5
+                            w-full
+                            rounded-full
+                            bg-gray-100
+                            overflow-hidden
+                        ">
+
+                            <div className="
+                                h-full
+                                w-1/3
+                                rounded-full
+                                bg-[#3d84cd]
+                                animate-[otpProgress_1.4s_ease-in-out_infinite]
+                            " />
+
+                        </div>
+
+
+                        {/* Status */}
+
+                        <div className="
+                            mt-4
+                            flex
+                            items-center
+                            justify-center
+                            gap-2
+                            text-[11px]
+                            text-gray-400
+                        ">
+
+                            <span className="
+                                w-1.5
+                                h-1.5
+                                rounded-full
+                                bg-[#3d84cd]
+                                animate-pulse
+                            " />
+
+                            Securing your account...
+
+                        </div>
+
+                    </div>
+
+                </div>
+            )}
           <div className="w-full flex flex-col items-center">
             <img className='w-35 h-35 object-cover' src={brd_logo} alt="" />
             <h1 className='text-2xl font-bold text-black'>BRD</h1>
@@ -191,15 +336,29 @@ const AuthOtpModal = ({
                 {otp.map((digit, index) => (
 
                   <input
-                    key={index}
-                    ref={(el) => (inputs.current[index] = el)}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-15 h-15 rounded-2xl bg-gray-100 text-center text-2xl font-semibold outline-none focus:ring-2 focus:ring-blue-500"
+                      key={index}
+                      ref={(el) => (inputs.current[index] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      disabled={loading}
+                      onChange={(e) => handleChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      className="
+                          w-15
+                          h-15
+                          rounded-2xl
+                          bg-gray-100
+                          text-center
+                          text-2xl
+                          font-semibold
+                          outline-none
+                          focus:ring-2
+                          focus:ring-blue-500
+                          disabled:opacity-60
+                          disabled:cursor-not-allowed
+                      "
                   />
 
                 ))}
@@ -212,14 +371,64 @@ const AuthOtpModal = ({
               <p className="text-red-500 text-sm">{error}</p>
             )}
 
-            <button
-              onClick={verifyOtp}
-              disabled={loading}
-              className="w-full rounded-xl min-h-10 px-4 py-3 text-white font-bold bg-[#3d84cd]"
-            >
-              {loading ? "Verifying..." : (confirmText || "Verify OTP")}
-            </button>
+              <button
+                  onClick={verifyOtp}
+                  disabled={loading}
+                  className="
+                      relative
+                      w-full
+                      rounded-xl
+                      min-h-12
+                      px-4
+                      py-3
+                      text-white
+                      font-bold
+                      bg-[#3d84cd]
+                      overflow-hidden
+                      transition-all
+                      duration-200
+                      disabled:cursor-not-allowed
+                      disabled:opacity-90
+                  "
+              >
+                  {loading ? (
+                      <>
+                          <span className="
+                              absolute
+                              inset-0
+                              bg-white/10
+                              animate-pulse
+                          " />
 
+                          <span className="
+                              relative
+                              flex
+                              items-center
+                              justify-center
+                              gap-3
+                          ">
+
+                              <span className="
+                                  w-5
+                                  h-5
+                                  border-[2.5px]
+                                  border-white/30
+                                  border-t-white
+                                  rounded-full
+                                  animate-spin
+                              " />
+
+                              <span>
+                                  Verifying your code...
+                              </span>
+
+                          </span>
+                      </>
+                  ) : (
+                      confirmText || "Verify OTP"
+                  )}
+              </button>
+            
             {canResend ? (
 
               <button

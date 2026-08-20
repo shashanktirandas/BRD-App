@@ -14,6 +14,8 @@ import {
     getCities
 } from "../services/locationService";
 
+import OperationOverlay from "../components/OperationOverlay";
+
 const Upload = () => {
   const {creator,token,setCreator,fetchPosts}=useContext(AppContext);
   const [img, setImg] = useState(null);
@@ -29,8 +31,10 @@ const Upload = () => {
   const [lens, setLens] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState([]);
-  const [open, setOpen] = useState(false)
-  const navigate=useNavigate();
+  const [open, setOpen] = useState(false);
+    const [uploadState, setUploadState] = useState(null);
+
+    const navigate = useNavigate();
 
   const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
@@ -172,130 +176,100 @@ const Upload = () => {
     setOpen(true);
   }
   async function uploadPost() {
+    try {
 
-      try {
+        if (!imageFile) {
+            alert("Please select a bird photo.");
+            return;
+        }
 
-          if (!imageFile) {
+        // Close confirmation modal
+        setOpen(false);
 
-              alert(
-                  "Please select a bird photo."
-              );
+        // STEP 1
+        setUploadState({
+            step: "preparing",
+            message: "Preparing your photograph..."
+        });
 
-              return;
+        // Small transition so the user actually sees the state
+        await new Promise(resolve => setTimeout(resolve, 400));
 
-          }
+        const formData = new FormData();
 
+        // IMAGE
+        formData.append("image", imageFile);
 
-          const formData =
-              new FormData();
+        // POST DATA
+        formData.append("birdName", birdName);
+        formData.append("scientificName", scientificName);
+        formData.append("description", discription);
+        formData.append("country", country);
+        formData.append("state", state);
+        formData.append("city", city);
+        formData.append(
+            "capturedAt",
+            new Date().toISOString()
+        );
+        formData.append("cameraBrand", cameraBrand);
+        formData.append("cameraModel", cameraModel);
+        formData.append("lens", lens);
 
+        // TAGS
+        tags.forEach((tag) => {
+            formData.append("tags", tag);
+        });
 
-          // ==========================================
-          // IMAGE
-          // ==========================================
+        // STEP 2
+        setUploadState({
+            step: "uploading",
+            message: "Uploading your photograph..."
+        });
 
-          formData.append(
-              "image",
-              imageFile
-          );
+        await post_upload(formData);
 
+        // STEP 3
+        setUploadState({
+            step: "publishing",
+            message: "Creating your post..."
+        });
 
-          // ==========================================
-          // POST DATA
-          // ==========================================
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-          formData.append(
-              "birdName",
-              birdName
-          );
+        // STEP 4
+        setUploadState({
+            step: "refreshing",
+            message: "Updating your feed..."
+        });
 
-          formData.append(
-              "scientificName",
-              scientificName
-          );
+        await fetchPosts();
 
-          formData.append(
-              "description",
-              discription
-          );
+        // SUCCESS
+        setUploadState({
+            step: "success",
+            message: "Your post is live!"
+        });
 
-          formData.append(
-              "country",
-              country
-          );
+        // Let user see success
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-          formData.append(
-              "state",
-              state
-          );
+        navigate("/");
 
-          formData.append(
-              "city",
-              city
-          );
+    } catch (error) {
 
-          formData.append(
-              "capturedAt",
-              new Date().toISOString()
-          );
+        console.error(
+            "POST UPLOAD ERROR:",
+            error
+        );
 
-          formData.append(
-              "cameraBrand",
-              cameraBrand
-          );
-
-          formData.append(
-              "cameraModel",
-              cameraModel
-          );
-
-          formData.append(
-              "lens",
-              lens
-          );
-
-
-          // ==========================================
-          // TAGS
-          // ==========================================
-
-          tags.forEach((tag) => {
-                formData.append("tags", tag);
-            });
-
-
-          // ==========================================
-          // API
-          // ==========================================
-
-          await post_upload(
-              formData
-          );
-
-
-          setOpen(false);
-
-          await fetchPosts();
-
-          navigate("/");
-
-
-      } catch (error) {
-
-          console.error(
-              "POST UPLOAD ERROR:",
-              error
-          );
-
-
-          alert(
-              error?.response?.data?.message ||
-              "Failed to upload post."
-          );
-
-      }
-
-  }
+        setUploadState({
+            step: "error",
+            message:
+                error?.response?.data?.message ||
+                "Failed to upload post."
+        });
+    }
+}
   function handleImage(e) {
 
       const file =
@@ -843,15 +817,19 @@ const Upload = () => {
                                   <p className='text-sm font-bold'>Upload</p>
                       </button>
                       <ConfirmModal
-                          isOpen={open}
-                          title="Uploading your post"
-                          message="Are you sure to upload this post."
-                          confirmText="Continue"
-                          cancelText="Not Now"
-                          onConfirm={uploadPost}
-                          onCancel={() => setOpen(false)}
-                          setOpen={setOpen}
-                      />                
+                            isOpen={open}
+                            title="Uploading your post"
+                            message="Are you sure to upload this post."
+                            confirmText="Continue"
+                            cancelText="Not Now"
+                            onConfirm={uploadPost}
+                            onCancel={() => setOpen(false)}
+                            setOpen={setOpen}
+                        />             
+                        <OperationOverlay
+                            state={uploadState}
+                            image={img}
+                        />
                   </div>
               </div>
 

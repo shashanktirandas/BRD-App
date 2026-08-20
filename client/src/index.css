@@ -23,3 +23,41 @@ input::-ms-reveal,
 input::-ms-clear {
     display: none;
 }
+
+@keyframes loadingBar {
+    0% {
+        transform: translateX(-120%);
+    }
+
+    50% {
+        transform: translateX(180%);
+    }
+
+    100% {
+        transform: translateX(420%);
+    }
+}
+
+@keyframes otpProgress {
+    0% {
+        transform: translateX(-120%);
+    }
+
+    50% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(320%);
+    }
+}
+
+@keyframes imageShimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(300%);
+    }
+}

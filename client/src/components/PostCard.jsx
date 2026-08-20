@@ -1,30 +1,27 @@
-import React from 'react'
-import Card from './Card';
+import React from "react";
+import Card from "./Card";
+import PostMasonry from "./PostMasonry";
 
-const PostCard = (props) => {
+const PostCard = ({ list }) => {
 
-    console.log('post card', props);
-
-    if (!props.list) return null;
+    if (!list?.length) return null;
 
     return (
-        <div className="w-full min-h-50 mt-4 p-1 flex gap-3 flex-wrap justify-center lg:justify-center">
+        <PostMasonry>
+            {list.map((ele) => (
+                <div
+                    key={ele._id}
+                    className="
+                        w-full
+                        mb-4
+                        break-inside-avoid
+                    "
+                >
+                    <Card ele={ele} />
+                </div>
+            ))}
+        </PostMasonry>
+    );
+};
 
-            {
-                props.list.map((ele) => {
-
-                    return (
-                        <Card
-                            key={ele._id}
-                            ele={ele}
-                        />
-                    );
-
-                })
-            }
-
-        </div>
-    )
-}
-
-export default PostCard
+export default PostCard;

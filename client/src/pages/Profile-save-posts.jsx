@@ -5,6 +5,7 @@ import PostCard from '../components/PostCard'
 import card_photo from '../img/card-photo2.jpg'
 import Menubar from '../components/Menubar'
 import AppContext from '../context/AppContext'
+import MasonrySkeleton from "../components/loading/MasonrySkeleton";
 
 const Profile_save_posts = () => {
   const [savedMenu, setSavedMenu] = useState({
@@ -17,9 +18,11 @@ const Profile_save_posts = () => {
   });
    const {
         savePosts,
-        setSavePosts,
-        fetchSavedPosts
+        fetchSavedPosts,
+        loadingSavedPosts
     } = useContext(AppContext);
+    
+
   const buildSavedMenu = (posts) => {
 
       const allTags = posts.flatMap(post =>
@@ -90,8 +93,14 @@ const Profile_save_posts = () => {
                             <h2 className='text-black'>Saved </h2>
                             <p className='text-gray-400'>& {savePosts? savePosts.length : 0} posts</p>
                       </div>
-                      {savePosts && (
-                                <>
+                      
+                      {loadingSavedPosts ? (
+
+    <MasonrySkeleton count={8} />
+
+                        ) : savePosts && savePosts.length > 0 ? (
+
+                            <>
                       <Menubar
                           list={savedMenu}
                           onSelect={selectSavedMenu}
@@ -102,7 +111,52 @@ const Profile_save_posts = () => {
                           list={filteredSavedPosts}
                       />
                       </>
-                      )}
+
+                        ) : (
+
+                            <div className="
+                                w-full
+                                flex
+                                flex-col
+                                items-center
+                                justify-center
+                                py-20
+                                text-center
+                            ">
+
+                                <div className="
+                                    w-16
+                                    h-16
+                                    rounded-2xl
+                                    bg-gray-100
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-2xl
+                                ">
+                                    🔖
+                                </div>
+
+                                <h3 className="
+                                    mt-4
+                                    text-base
+                                    font-semibold
+                                    text-gray-800
+                                ">
+                                    No saved posts yet
+                                </h3>
+
+                                <p className="
+                                    mt-1
+                                    text-sm
+                                    text-gray-400
+                                ">
+                                    Posts you bookmark will appear here.
+                                </p>
+
+                            </div>
+
+                        )}
                       
                   </div>
               </div>

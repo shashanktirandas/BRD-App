@@ -4,6 +4,7 @@ import Menubar from '../components/Menubar';
 import PostCard from '../components/PostCard';
 import AppContext from '../context/AppContext';
 import CreatorSlideBar from '../components/CreatorSlideBar';
+import MasonrySkeleton from "../components/loading/MasonrySkeleton";
 
 const Home = () => {
 
@@ -13,6 +14,7 @@ const Home = () => {
         fetchPosts,
         postPage,
         hasMorePosts,
+        loadingPosts,
         loadingMorePosts,
         selectMenu,
         selectedMenu
@@ -146,12 +148,19 @@ const Home = () => {
                         />
                     </div>
 
-                    <PostCard list={posts} />
+                    {/* INITIAL FEED LOADING */}
+
+                    {loadingPosts ? (
+                        <MasonrySkeleton count={8} />
+                    ) : (
+                        <PostCard list={posts} />
+                    )}
+
+
+                    {/* LOAD MORE */}
 
                     {loadingMorePosts && (
-                        <div className="w-full text-center py-6 text-gray-500">
-                            Loading more posts...
-                        </div>
+                        <MasonrySkeleton count={4} />
                     )}
 
                 </div>

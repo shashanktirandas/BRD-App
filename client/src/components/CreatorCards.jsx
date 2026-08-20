@@ -1,19 +1,27 @@
-import React from 'react'
-import Card from './Card'
-import EditCard from './EditCard'
+import React from "react";
+import EditCard from "./EditCard";
+import PostMasonry from "./PostMasonry";
 
-const CreatorCards = (props) => {
-  console.log(props);
-  return (
-    <div  className=" w-full min-h-50 mt-4 p-1 flex gap-3  flex-wrap  justify-center lg:justify-center">
-                       {
-                        props.list.map((ele,idx)=>{
-                                  return <EditCard key={idx} ele={ele}  />
-                        })
-                       }
-                       
-                 </div>
-  )
-}
+const CreatorCards = ({ list }) => {
 
-export default CreatorCards
+    if (!list?.length) return null;
+
+    return (
+        <PostMasonry>
+            {list.map((ele) => (
+                <div
+                    key={ele._id}
+                    className="
+                        w-full
+                        mb-4
+                        break-inside-avoid
+                    "
+                >
+                    <EditCard ele={ele} />
+                </div>
+            ))}
+        </PostMasonry>
+    );
+};
+
+export default CreatorCards;

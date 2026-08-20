@@ -60,6 +60,7 @@ const AppProvider = ({ children }) => {
     const [postPage, setPostPage] = useState(1);
     const [hasMorePosts, setHasMorePosts] = useState(true);
     const [loadingMorePosts, setLoadingMorePosts] = useState(false);
+    const [loadingPosts, setLoadingPosts] = useState(false);
     
     const loadedPostIdsRef = useRef(new Set());
     const loadingPostsRef = useRef(false);
@@ -137,18 +138,34 @@ const AppProvider = ({ children }) => {
                                 setCreatorPosts([]);
                             }
     }; 
-    const fetchSavedPosts = async () => { 
-            try {                
-                        const response = await get_bookmark_posts();
-                        const bookmarkPosts = response.data.data.posts.map(bookmark => bookmark.post);
-                        setSavePosts(bookmarkPosts);
-                        console.log(bookmarkPosts);
-                        
-                            } catch (err) { 
-                                console.log(err);
-                                setSavePosts([]);
-                            }
-    }; 
+    const [loadingSavedPosts, setLoadingSavedPosts] = useState(false);
+    const fetchSavedPosts = async () => {
+
+        setLoadingSavedPosts(true);
+
+        try {
+
+            const response = await get_bookmark_posts();
+
+            const bookmarkPosts =
+                response?.data?.data?.posts?.map(
+                    bookmark => bookmark.post
+                ) || [];
+
+            setSavePosts(bookmarkPosts);
+
+        } catch (err) {
+
+            console.log(err);
+
+            setSavePosts([]);
+
+        } finally {
+
+            setLoadingSavedPosts(false);
+
+        }
+    };
 
     const fetchFollowingAccounts = async () => { 
             try {                
@@ -197,6 +214,8 @@ const AppProvider = ({ children }) => {
 
             if (page > 1) {
                 setLoadingMorePosts(true);
+            } else {
+                setLoadingPosts(true);
             }
 
             // For page 1, start a fresh feed
@@ -284,9 +303,10 @@ const AppProvider = ({ children }) => {
             console.log(err);
 
         } finally {
-        loadingPostsRef.current = false;
-        setLoadingMorePosts(false);
-    }
+            loadingPostsRef.current = false;
+            setLoadingMorePosts(false);
+            setLoadingPosts(false);
+        }
     }, [selectedMenu, hasMorePosts]);
     
     const fetchMenu = async () => {
@@ -608,6 +628,8 @@ const AppProvider = ({ children }) => {
                 hasMorePosts,
                 loadingMorePosts,
                 setLoadingMorePosts,
+                
+                loadingPosts,
 
                 creatorPosts,
                 setCreatorPosts,
@@ -647,7 +669,9 @@ const AppProvider = ({ children }) => {
                 setModal,
 
                 transformed,
-                setTransformed
+                setTransformed,
+
+                loadingSavedPosts
             }}
         >
             {children}
